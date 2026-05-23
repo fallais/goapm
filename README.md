@@ -1,30 +1,32 @@
 # gopam
 
 A Go port of WebRTC's Audio Processing Module (APM): acoustic echo
-cancellation, noise suppression, automatic gain control, high-pass filter,
-voice activity detection.
+cancellation, noise suppression, automatic gain control, high-pass filter.
 
-**Status:** test infrastructure only. No DSP modules are implemented yet.
-The `apm.Processor` is a passthrough stub until module porting begins.
+## Layout
 
-## What ships today
-
-This repository currently contains the testing apparatus, modeled on
-Google's own APM testing stack:
-
-| Component | Purpose |
+| Package | Purpose |
 | --- | --- |
-| `apm` | Public API surface (passthrough Processor for now) |
+| `apm` | Public Processor — composes the pipeline modules per stream |
+| `hpf` | High-pass filter (3-stage cascaded biquad per rate) |
+| `ns` | Noise suppression (STFT Wiener filter with MCRA noise tracking) |
+| `agc` | Automatic gain control (fixed-digital gain + limiter) |
+| `dsp/fft` | Allocation-free real radix-2 FFT |
+| `dsp/biquad` | Direct-form I cascaded biquad |
+| `dsp/window` | Hann / sqrt-Hann tables |
 | `audio/wav` | Streaming WAV I/O |
-| `test/synth` | Synthetic signal generators (tones, noise, impulses, IRs) |
-| `test/metrics` | Native DSP metrics (segSNR, LSD, cepstral, ERLE, attack time) |
-| `test/visqol` | Wrapper around the ViSQOL external binary for MOS-style scores |
+| `test/synth` | Synthetic signal generators |
+| `test/metrics` | DSP metrics (segSNR, LSD, cepstral, ERLE, attack time) |
+| `test/visqol` | External ViSQOL binary wrapper |
 | `test/property` | Property-based scenarios with thresholded assertions |
 | `test/aecdump` | Replay of WebRTC `.aecdump` debug recordings |
 | `test/bench` | Per-frame benchmarks + real-time-factor reporter |
-| `cmd/aecdump-replay` | Replay an `.aecdump` through a Processor, emit WAV |
-| `cmd/qa-runner` | Run a matrix of clip × noise × IR scenarios, emit JSON |
+| `cmd/aecdump-replay` | Drive a Processor with an `.aecdump`, emit WAV |
+| `cmd/qa-runner` | Matrix of clip × noise × IR scenarios → JSON report |
 | `cmd/rtf-bench` | Standalone real-time-factor measurement |
+
+The port tracks upstream WebRTC's `modules/audio_processing/` at the pinned
+commit in `third_party/webrtc-proto/PINNED_COMMIT`.
 
 ## Quick start
 
@@ -49,24 +51,14 @@ PR-time CI runs against the small smoke corpus committed in
 ## ViSQOL
 
 ViSQOL is not required to run the test suite; metrics that depend on it
-are skipped when the binary is absent. To enable:
-
-```
-# Build ViSQOL from https://github.com/google/visqol and place the
-# binary on PATH, then:
-visqol --version
-```
-
-The version we pin against is recorded in `test/visqol/doc.go`.
-
-## Repository layout
-
-See [docs/LAYOUT.md](docs/LAYOUT.md) for the full directory map and rationale.
+are skipped when the binary is absent. To enable, build ViSQOL from
+[google/visqol](https://github.com/google/visqol) and place the binary on
+PATH. The version we pin against is recorded in `test/visqol/doc.go`.
 
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
 
-This project intentionally tracks WebRTC's licensing (BSD 3-Clause for the
-original code we draw inspiration from, Apache 2.0 for our own work) so that
-later ports of upstream algorithms remain compatible.
+Portions of this project port logic from WebRTC, which is licensed under
+the BSD 3-Clause License. Upstream notices are preserved under
+`third_party/webrtc-proto/`.

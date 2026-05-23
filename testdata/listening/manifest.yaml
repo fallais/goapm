@@ -7,10 +7,9 @@
 versions:
   - id: v0.1.0
     notes: |
-      Placeholder version. Audio files are not yet committed because no
-      DSP modules are implemented; until then the before/after snapshots
-      would be identical (passthrough). First real entries land with the
-      NS module.
+      Initial listening snapshots are added as releases ship. Each entry
+      lists what to listen for so an auditor can compare against the
+      expected tuning behavior.
     scenarios: []
 #     - name: echo_kitchen
 #       listen_for: |

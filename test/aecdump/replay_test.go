@@ -139,7 +139,7 @@ func runReplay(dumpPath, outPath string) error {
 		switch ev.Type {
 		case webrtcproto.EventInit:
 			rate := apm.SampleRate(ev.Init.SampleRate)
-			processor, _ = apm.New(apm.DefaultConfig())
+			processor, _ = apm.New(apm.DefaultConfig(rate, int(ev.Init.NumInputChannels)))
 			nearFrame = apm.NewFrame(rate, int(ev.Init.NumInputChannels))
 			farFrame = apm.NewFrame(apm.SampleRate(ev.Init.ReverseSampleRate), int(ev.Init.NumReverseChannels))
 			writer, err = wav.CreateWriter(outPath, int(rate), int(ev.Init.NumInputChannels), wav.Float32)

@@ -19,7 +19,7 @@ func TestRTF_PassthroughIsRealTime(t *testing.T) {
 		rate    = apm.Rate16k
 		seconds = 10
 	)
-	p, _ := apm.New(apm.DefaultConfig())
+	p, _ := apm.New(apm.DefaultConfig(rate, 1))
 	frame := apm.NewFrame(rate, 1)
 	per := rate.SamplesPerFrame()
 	framesPerSecond := int(rate) / per

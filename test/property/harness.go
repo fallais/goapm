@@ -1,7 +1,6 @@
 // Package property holds property-based test scenarios that assert DSP
 // behavior (ERLE thresholds, SNR-improvement targets, attack times) on
-// each APM module. Scenarios skip themselves until the module they
-// exercise is implemented — see Implemented.
+// each APM module.
 //
 // Thresholds for every scenario live in thresholds.yaml at this package
 // root; LoadThresholds parses it once per test binary.
@@ -19,40 +18,6 @@ import (
 
 	"github.com/fallais/gopam/apm"
 )
-
-// Module names tracked by the implementation registry.
-const (
-	ModuleHPF = "hpf"
-	ModuleNS  = "ns"
-	ModuleAGC = "agc"
-	ModuleAEC = "aec"
-)
-
-// Implemented returns whether the named module currently performs real
-// processing (vs. passthrough). Update this map as modules land.
-//
-// Property tests that need the module to actually work call
-// RequireImplemented to skip themselves until the module ships.
-var Implemented = map[string]bool{
-	ModuleHPF: false,
-	ModuleNS:  false,
-	ModuleAGC: false,
-	ModuleAEC: false,
-}
-
-// RequireImplemented skips the test if the named module is still a
-// passthrough stub. T must satisfy a minimal Skipf interface (testing.T).
-type Skipper interface {
-	Skipf(format string, args ...any)
-	Helper()
-}
-
-func RequireImplemented(t Skipper, module string) {
-	t.Helper()
-	if !Implemented[module] {
-		t.Skipf("module %q not implemented yet (still passthrough)", module)
-	}
-}
 
 // Thresholds is the parsed contents of thresholds.yaml: scenario name →
 // expected metric bounds. Tests query it to keep the spec out of code.
@@ -118,12 +83,9 @@ func MustBounds(t Fataler, scenario string) ScenarioBounds {
 	return b
 }
 
-// Pipeline is the bridge between synthesized planar signals and the APM
-// Processor (which works on Frames). It splits a long buffer into
-// 10 ms frames and calls ProcessStream on each.
-//
-// Frames are reused across calls — zero allocations in the hot loop once
-// Process is warm.
+// Pipeline bridges raw planar buffers and the apm.Processor, splitting a
+// long buffer into 10 ms frames and processing each in turn. The frame
+// buffer is reused across calls so the hot loop allocates nothing.
 type Pipeline struct {
 	processor *apm.Processor
 	rate      apm.SampleRate
@@ -137,8 +99,8 @@ func NewPipeline(p *apm.Processor, rate apm.SampleRate) *Pipeline {
 }
 
 // ProcessStream runs near-end samples through the pipeline 10 ms at a
-// time. Output is written into outBuf (which may be the same slice as
-// near). Returns the number of samples processed.
+// time. Output is written into outBuf (which may alias near). Returns
+// the number of samples processed.
 func (p *Pipeline) ProcessStream(near, outBuf []float32) (int, error) {
 	if len(outBuf) < len(near) {
 		return 0, fmt.Errorf("property: outBuf shorter than input")

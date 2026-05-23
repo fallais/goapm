@@ -1,9 +1,8 @@
-# Pinned upstream source for debug.proto
+# Pinned upstream source for the entire WebRTC APM port.
 #
 # Repository: https://webrtc.googlesource.com/src
-# File:       modules/audio_processing/debug.proto
-# Commit:     PLACEHOLDER — replace with a real SHA from
-#             https://webrtc.googlesource.com/src/+log/refs/heads/main/modules/audio_processing/debug.proto
+# Commit:     d02cf0dd81db9ffc06c657ea7f24eb305dfe4024
+# Path:       modules/audio_processing/
 #
 # To resync:
 #   1. Pick a new upstream commit.

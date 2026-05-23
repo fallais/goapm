@@ -145,7 +145,9 @@ func setupFromInit(init *webrtcproto.Init, fHPF, fNS bool, fNSLevel int, fAGC, f
 	if init.ReverseSampleRate > 0 {
 		farRate = apm.SampleRate(init.ReverseSampleRate)
 	}
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(nearRate, int(init.NumInputChannels))
+	cfg.ReverseSampleRate = farRate
+	cfg.ReverseNumChannels = int(init.NumReverseChannels)
 	cfg.HPF.Enabled = fHPF
 	cfg.NS.Enabled = fNS
 	if fNSLevel >= 0 {

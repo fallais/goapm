@@ -2,8 +2,8 @@ package apm
 
 import "testing"
 
-func TestPassthrough_PreservesSamples(t *testing.T) {
-	p, err := New(DefaultConfig())
+func TestProcessStream_RoundtripsSamples(t *testing.T) {
+	p, err := New(DefaultConfig(Rate16k, 1))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -16,9 +16,10 @@ func TestPassthrough_PreservesSamples(t *testing.T) {
 	if err := p.ProcessStream(f); err != nil {
 		t.Fatal(err)
 	}
+	// With all modules disabled, ProcessStream is a pass-through.
 	for i, got := range f.Data[0] {
 		if got != want[i] {
-			t.Fatalf("sample %d: passthrough should leave samples untouched, got %f want %f", i, got, want[i])
+			t.Fatalf("sample %d: got %f want %f", i, got, want[i])
 		}
 	}
 }
@@ -63,7 +64,7 @@ func TestSamplesPerFrame(t *testing.T) {
 }
 
 func TestProcessor_ZeroAllocSteadyState(t *testing.T) {
-	p, _ := New(DefaultConfig())
+	p, _ := New(DefaultConfig(Rate16k, 1))
 	f := NewFrame(Rate16k, 1)
 	// Warm up — first call may allocate scratch.
 	_ = p.ProcessStream(f)

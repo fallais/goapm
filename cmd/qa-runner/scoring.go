@@ -61,7 +61,7 @@ func scoreCell(c Cell) Score {
 }
 
 func scoreNSClean(s Score, clean []float32, rate int) Score {
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(apm.SampleRate(rate), 1)
 	cfg.NS = apm.NSConfig{Enabled: true, Level: apm.NSModerate}
 	out := process(cfg, apm.SampleRate(rate), clean)
 	s.LSDdB = metrics.LogSpectralDistance(clean, out, rate, 512, 256)
@@ -93,7 +93,7 @@ func scoreNSNoisy(s Score, c Cell, clean []float32, rate int, rng *rand.Rand) Sc
 		s.Error = "mix: " + err.Error()
 		return s
 	}
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(apm.SampleRate(rate), 1)
 	cfg.NS = apm.NSConfig{Enabled: true, Level: apm.NSHigh}
 	out := process(cfg, apm.SampleRate(rate), noisy)
 	inSNR := metrics.SNR(clean, noisy)
@@ -108,7 +108,7 @@ func scoreNSNoisy(s Score, c Cell, clean []float32, rate int, rng *rand.Rand) Sc
 
 func scoreAGC(s Score, clean []float32, rate int) Score {
 	synth.ScaleToDBFS(clean, -25) // quiet input
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(apm.SampleRate(rate), 1)
 	cfg.AGC = apm.AGCConfig{Enabled: true, TargetLevelDBFS: -10, CompressionGain: 9}
 	out := process(cfg, apm.SampleRate(rate), clean)
 	s.PeakDBFS = metrics.PeakLevelDBFS(out)
@@ -135,7 +135,7 @@ func scoreAEC(s Score, c Cell, clean []float32, rate int, rng *rand.Rand) Score 
 	echo := synth.Convolve(far, ir)[:len(far)]
 	mic := append([]float32(nil), echo...) // pure echo, no near-end speech
 
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(apm.SampleRate(rate), 1)
 	cfg.AEC.Enabled = true
 	p, _ := apm.New(cfg)
 	rate2 := apm.SampleRate(rate)

@@ -40,9 +40,11 @@ agc_target_level:
     0.5 s and within 1 dB of target.
 
 agc_no_overshoot:
-  max_peak_dbfs: -1.0
+  max_peak_dbfs: 0.0
   notes: |
-    AGC output peak must stay below -1 dBFS regardless of input level.
+    AGC limiter must keep output peak at or below 0 dBFS (saturation
+    ceiling) regardless of input level. Upstream's limiter targets
+    -1 dBFS knee → 0 dBFS ceiling.
 
 hpf_corner:
   min_corner_db: -2.5

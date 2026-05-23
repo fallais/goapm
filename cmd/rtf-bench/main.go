@@ -40,7 +40,7 @@ func main() {
 	if !sr.Valid() {
 		log.Fatalf("invalid -rate %d", *rate)
 	}
-	cfg := apm.DefaultConfig()
+	cfg := apm.DefaultConfig(sr, *channels)
 	cfg.HPF.Enabled = *enableHPF
 	cfg.NS.Enabled = *enableNS
 	cfg.AGC.Enabled = *enableAGC
