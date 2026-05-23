@@ -1,0 +1,14 @@
+# Pinned upstream source for debug.proto
+#
+# Repository: https://webrtc.googlesource.com/src
+# File:       modules/audio_processing/debug.proto
+# Commit:     PLACEHOLDER — replace with a real SHA from
+#             https://webrtc.googlesource.com/src/+log/refs/heads/main/modules/audio_processing/debug.proto
+#
+# To resync:
+#   1. Pick a new upstream commit.
+#   2. Download debug.proto at that commit, overwrite debug.proto here.
+#   3. Update this file with the new SHA + date.
+#   4. Regenerate debug.pb.go (see ../../tools/tools.go for the protoc invocation).
+#   5. Run the .aecdump replay tests against the existing corpus to catch
+#      schema changes that break the binary format.

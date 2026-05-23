@@ -1,0 +1,9 @@
+* text=auto eol=lf
+
+# Treat audio fixtures as binary; route through Git LFS if available.
+*.wav      binary filter=lfs diff=lfs merge=lfs
+*.aecdump  binary filter=lfs diff=lfs merge=lfs
+*.flac     binary filter=lfs diff=lfs merge=lfs
+
+# Generated protobuf code: keep diffs minimal.
+*.pb.go    linguist-generated=true

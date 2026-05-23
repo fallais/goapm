@@ -1,0 +1,43 @@
+name: bench-nightly
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC daily, after qa
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: per-frame benchmarks
+        run: |
+          go test -bench=. -benchmem -count=3 -run=^$ ./test/bench/... \
+              | tee bench.txt
+
+      - name: rtf-bench (passthrough + each module solo)
+        run: |
+          set -x
+          go run ./cmd/rtf-bench -seconds 30 -json rtf-passthrough.json
+          go run ./cmd/rtf-bench -seconds 30 -hpf -json rtf-hpf.json
+          go run ./cmd/rtf-bench -seconds 30 -ns  -json rtf-ns.json
+          go run ./cmd/rtf-bench -seconds 30 -agc -json rtf-agc.json
+          go run ./cmd/rtf-bench -seconds 30 -aec -json rtf-aec.json
+
+      - name: upload bench artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-${{ github.run_id }}
+          path: |
+            bench.txt
+            rtf-*.json
+          retention-days: 30

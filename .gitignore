@@ -1,0 +1,24 @@
+# Pulled corpora (use pull.sh to fetch)
+/testdata/clips/full/
+/testdata/noise/full/
+/testdata/irs/full/
+
+# Test diagnostic dumps
+/testdata/diag/*.wav
+!/testdata/diag/.gitkeep
+
+# Build / tool output
+*.test
+*.out
+/dist/
+/coverage.out
+/coverage.html
+
+# QA reports (kept out of git; baselines live in cmd/qa-runner/baseline/)
+/qa-report*.json
+!cmd/qa-runner/baseline/*.json
+
+# Editors
+.vscode/
+.idea/
+*.swp

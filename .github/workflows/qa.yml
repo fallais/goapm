@@ -1,0 +1,44 @@
+name: qa-nightly
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # 05:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa-full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: pull full corpora
+        run: |
+          bash testdata/clips/pull.sh
+          bash testdata/noise/pull.sh
+          bash testdata/irs/pull.sh
+
+      - name: run qa-runner
+        run: go run ./cmd/qa-runner -corpus full -out qa-report-nightly.json
+
+      - name: compare against baseline
+        run: |
+          # The compare step opens an issue on regression; for now it is
+          # an advisory diff because no baseline is committed yet.
+          ls cmd/qa-runner/baseline/ || true
+
+      - name: upload nightly report
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-nightly-${{ github.run_id }}
+          path: qa-report-nightly.json
+          retention-days: 30
